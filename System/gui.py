@@ -8,8 +8,6 @@ from System.console_log import (
 
 
 class SplashScreen(tk.Toplevel):
-    """Small window with a loading bar shown before the main app opens."""
-
     def __init__(self, root, on_done):
         super().__init__(root)
         self.on_done = on_done
@@ -40,7 +38,6 @@ class SplashScreen(tk.Toplevel):
 
 
 class EmployeeManagementApp:
-    # ---- color palette + fonts (change these to re-theme the whole app) ----
     BG_COLOR = "#f4f6f8"
     PRIMARY = "#2c3e50"
     ACCENT = "#3498db"
@@ -56,27 +53,32 @@ class EmployeeManagementApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Employee Management System")
-        self.root.geometry("950x520")
+        self.root.geometry("950x550")
         self.root.configure(bg=self.BG_COLOR)
-        self.root.withdraw()  # hide main window until the splash finishes
+        self.root.withdraw()
 
         self.employees = []
         self.selected_id = None
 
-        # terminal side: banner + loading bar (art, tqdm)
         show_banner()
         show_loading_bar()
 
         SplashScreen(self.root, on_done=self.start_app)
 
     def start_app(self):
-        self.root.deiconify()  # reveal the main window now that loading is done
+        self.root.deiconify()
 
+        self.build_header()
         self.build_form()
         self.build_table()
         self.build_search()
-        self.build_oop_panel()
         self.load_sample_employees()
+
+    def build_header(self):
+        header = tk.Label(self.root, text=f"🏢 {Employee.company_name}",
+                           bg=self.PRIMARY, fg="white", font=("Segoe UI", 14, "bold"),
+                           anchor="center")
+        header.place(x=0, y=0, width=950, height=40)
 
     def load_sample_employees(self):
         self.employees.append(Employee("Maria Santos", 28, "E001", "IT", "Software Developer"))
@@ -86,7 +88,7 @@ class EmployeeManagementApp:
     def build_form(self):
         form_frame = tk.LabelFrame(self.root, text="Employee Details", padx=10, pady=10,
                                     bg=self.BG_COLOR, fg=self.PRIMARY, font=self.FONT_HEADER)
-        form_frame.place(x=10, y=10, width=280, height=300)
+        form_frame.place(x=10, y=50, width=280, height=300)
 
         labels = ["Name", "Age", "Employee ID", "Department", "Position"]
         self.entries = {}
@@ -98,7 +100,7 @@ class EmployeeManagementApp:
             self.entries[label] = entry
 
         button_frame = tk.Frame(self.root, bg=self.BG_COLOR)
-        button_frame.place(x=10, y=320, width=280, height=140)
+        button_frame.place(x=10, y=360, width=280, height=140)
 
         tk.Button(button_frame, text="➕ Add Employee", width=22, bg=self.SUCCESS, fg="white",
                   font=self.FONT_BOLD, relief="flat", command=self.add_employee).grid(row=0, column=0, pady=4)
@@ -111,7 +113,7 @@ class EmployeeManagementApp:
 
     def build_table(self):
         style = ttk.Style()
-        style.theme_use("clam")  # "clam" actually shows custom colors, unlike the default theme
+        style.theme_use("clam")
         style.configure("Treeview", background="white", foreground=self.TEXT_COLOR,
                          rowheight=26, fieldbackground="white", font=self.FONT_NORMAL)
         style.configure("Treeview.Heading", background=self.PRIMARY, foreground="white",
@@ -120,7 +122,7 @@ class EmployeeManagementApp:
 
         table_frame = tk.LabelFrame(self.root, text="Employees", padx=5, pady=5,
                                      bg=self.BG_COLOR, fg=self.PRIMARY, font=self.FONT_HEADER)
-        table_frame.place(x=300, y=10, width=630, height=400)
+        table_frame.place(x=300, y=50, width=630, height=460)
 
         columns = ("name", "age", "id", "department", "position")
         self.tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=15)
@@ -136,14 +138,13 @@ class EmployeeManagementApp:
         self.tree.pack(fill="both", expand=True)
         self.tree.bind("<<TreeviewSelect>>", self.on_row_select)
 
-        # zebra stripes, set once here and used by refresh_table()
         self.tree.tag_configure("evenrow", background="#ffffff")
         self.tree.tag_configure("oddrow", background="#eef2f5")
 
     def build_search(self):
         search_frame = tk.LabelFrame(self.root, text="Search", padx=10, pady=10,
                                       bg=self.BG_COLOR, fg=self.PRIMARY, font=self.FONT_HEADER)
-        search_frame.place(x=10, y=420, width=280, height=60)
+        search_frame.place(x=10, y=460, width=280, height=60)
 
         self.search_entry = tk.Entry(search_frame, width=20, font=self.FONT_NORMAL, relief="solid", bd=1)
         self.search_entry.grid(row=0, column=0, padx=4)
@@ -151,17 +152,6 @@ class EmployeeManagementApp:
                   font=self.FONT_BOLD, command=self.search_employee).grid(row=0, column=1, padx=4)
         tk.Button(search_frame, text="📋 Show All", bg=self.NEUTRAL, fg="white", relief="flat",
                   font=self.FONT_BOLD, command=self.refresh_table).grid(row=0, column=2, padx=4)
-
-    def build_oop_panel(self):
-        oop_frame = tk.LabelFrame(self.root, text="OOP Demo", padx=10, pady=10,
-                                   bg=self.BG_COLOR, fg=self.PRIMARY, font=self.FONT_HEADER)
-        oop_frame.place(x=300, y=420, width=630, height=90)
-        tk.Button(oop_frame, text="🔎 Check isinstance / issubclass on selected row",
-                  bg=self.PRIMARY, fg="white", relief="flat", font=self.FONT_BOLD,
-                  command=self.show_oop_demo).pack(side="left", padx=5)
-        self.oop_label = tk.Label(oop_frame, text="", justify="left", anchor="w",
-                                   bg=self.BG_COLOR, fg=self.TEXT_COLOR, font=self.FONT_NORMAL)
-        self.oop_label.pack(side="left", padx=10)
 
     def get_form_values(self):
         return {
@@ -211,7 +201,6 @@ class EmployeeManagementApp:
         try:
             age = self.validate_common(values)
 
-            # FIX: block changing the ID to one another employee already has
             new_id = values["employee_id"]
             if new_id != self.selected_id and any(e.employee_id == new_id for e in self.employees):
                 raise ValueError("Another employee already uses that ID.")
@@ -247,7 +236,6 @@ class EmployeeManagementApp:
         for entry in self.entries.values():
             entry.delete(0, tk.END)
         self.selected_id = None
-        self.oop_label.config(text="")
 
     def refresh_table(self):
         for row in self.tree.get_children():
@@ -293,17 +281,3 @@ class EmployeeManagementApp:
                 matches.append(emp)
         log_info(f"Search results for '{term}':")
         log_employee_table(matches)
-
-    def show_oop_demo(self):
-        if self.selected_id is None:
-            messagebox.showwarning("No Selection", "Select a row in the table first.")
-            return
-        emp = next(e for e in self.employees if e.employee_id == self.selected_id)
-        text = (
-            f"isinstance(emp, Employee) -> {isinstance(emp, Employee)}\n"
-            f"isinstance(emp, Person) -> {isinstance(emp, Person)}\n"
-            f"issubclass(Employee, Person) -> {issubclass(Employee, Person)}\n"
-            f"emp.get_details() -> {emp.get_details()}"
-        )
-        self.oop_label.config(text=text)
-        log_info(text)

@@ -7,7 +7,7 @@ class InvalidEmployeeIDError(Exception):
 
 
 class Person:
-    company_name = "ADEi Solutions, Inc."
+    company_name = "Endfiels. INC"
 
     def __init__(self, name, age):
         if not isinstance(age, int) or age <= 0 or age > 120:
@@ -47,7 +47,6 @@ class Employee(Person):
         return self.get_details()
 
     def to_row(self):
-        # used for the tabulate table in the terminal
         return [self.name, self.age, self.employee_id, self.department, self.position]
 
     def update_info(self, name=None, age=None, department=None, position=None, employee_id=None):

@@ -1,9 +1,3 @@
-"""
-Terminal-side helpers using the required packages: art, colorama, termcolor,
-tabulate, tqdm. Tkinter can't show ASCII art or terminal colors, so this
-file mirrors what's happening in the GUI as colored logs in the terminal.
-"""
-
 import time
 
 from art import text2art
